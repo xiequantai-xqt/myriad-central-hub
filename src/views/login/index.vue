@@ -60,9 +60,10 @@
           </el-button>
         </el-form-item>
       </el-form>
-      <!-- 底部极简版权 -->
+      <!-- 底部极简版权（动态年份） -->
       <div class="login-footer">
-        <span>© 2025 CoreTech · All Rights Reserved</span>
+        <!-- 关键修改：绑定动态年份变量 -->
+        <span>© {{ currentYear }} CoreTech · All Rights Reserved</span>
       </div>
     </div>
   </div>
@@ -79,6 +80,9 @@ const userStore = useUserStore()
 const loginRef = ref(null)
 const isLoginLoading = ref(false)
 const passwordInput = ref(null)
+
+// 关键新增：动态获取当前年份
+const currentYear = new Date().getFullYear()
 
 // 登录表单
 const loginForm = ref({
