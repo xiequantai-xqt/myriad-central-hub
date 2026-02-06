@@ -271,12 +271,22 @@ const handleLogin = async () => {
     // 接口调用成功后的处理（根据实际接口返回调整）
     // 示例：将用户信息/Token存入store
     if (response && response.data) {
+      const token =
+        response.data.token ||
+        response.data?.data?.token ||
+        response.data?.data?.access_token ||
+        response.data?.data?.accessToken
+
+      if (token) {
+        userStore.token = token
+        localStorage.setItem('ADMIN_TOKEN', token)
+      }
       // 假设store中有存储token和用户信息的方法，根据实际情况调整
       // userStore.setToken(response.data.token)
       // userStore.setUserInfo(response.data.user)
       
       ElMessage.success('登录成功，进入核心系统...')
-      setTimeout(() => router.push('/'), 1200)
+      setTimeout(() => router.push('/dashboard'), 1200)
     }
   } catch (err) {
     // 错误处理（适配axios接口错误格式）
