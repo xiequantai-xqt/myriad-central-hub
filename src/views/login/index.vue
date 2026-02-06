@@ -173,6 +173,8 @@ import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 // 核心修改：引入views/register/index.vue组件
 import Register from '@/views/register/index.vue'
+// 核心新增：引入userLogin接口函数
+import { userLogin } from '@/api/user.js'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -249,10 +251,11 @@ const focusPasswordInput = () => {
   passwordInput.value?.focus()
 }
 
-// 登录逻辑
+// 核心修改：登录逻辑（替换为调用userLogin接口）
 const handleLogin = async () => {
   if (isLoginLoading.value) return
   
+  // 表单验证
   try {
     await loginRef.value.validate()
   } catch (err) {
@@ -262,11 +265,23 @@ const handleLogin = async () => {
 
   try {
     isLoginLoading.value = true
-    await userStore.login(loginForm.value)
-    ElMessage.success('登录成功，进入核心系统...')
-    setTimeout(() => router.push('/'), 1200)
+    // 调用真实的登录接口
+    const response = await userLogin(loginForm.value)
+    
+    // 接口调用成功后的处理（根据实际接口返回调整）
+    // 示例：将用户信息/Token存入store
+    if (response && response.data) {
+      // 假设store中有存储token和用户信息的方法，根据实际情况调整
+      // userStore.setToken(response.data.token)
+      // userStore.setUserInfo(response.data.user)
+      
+      ElMessage.success('登录成功，进入核心系统...')
+      setTimeout(() => router.push('/'), 1200)
+    }
   } catch (err) {
-    ElMessage.error('登录失败：' + (err.message || '账号或密码错误'))
+    // 错误处理（适配axios接口错误格式）
+    const errorMsg = err.response?.data?.message || err.message || '账号或密码错误'
+    ElMessage.error('登录失败：' + errorMsg)
   } finally {
     isLoginLoading.value = false
   }
