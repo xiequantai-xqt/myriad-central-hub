@@ -186,8 +186,8 @@ const currentYear = new Date().getFullYear()
 
 // 登录表单
 const loginForm = ref({
-  username: 'admin',
-  password: '123456'
+  username: 'testUser',
+  password: '7kbCbdlb!XtNBI&'
 })
 
 // 登录校验规则
