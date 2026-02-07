@@ -38,7 +38,7 @@ export const constantRoutes = [
   {
     path: '/analysis',
     component: Layout,
-    meta: { title: '经营分析' },
+    meta: { title: '经营分析', icon: 'PieChart' },
     children: [
       {
         path: 'malatang',

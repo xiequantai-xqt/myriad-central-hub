@@ -30,7 +30,7 @@
             </el-menu-item>
             <el-sub-menu v-else :index="route.path">
               <template #title>
-                <el-icon v-if="route.meta.icon" :class="route.path === '/system' ? 'menu-icon' : ''">
+                <el-icon v-if="route.meta.icon" :class="(route.path === '/system' || route.path === '/analysis') ? 'menu-icon' : ''">
                   <component :is="route.meta.icon" />
                 </el-icon>
                 <span>{{ route.meta.title }}</span>
