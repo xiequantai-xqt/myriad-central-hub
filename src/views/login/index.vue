@@ -26,15 +26,25 @@
         label-width="0"
         class="login-form"
       >
-        <el-form-item prop="email" class="form-item">
-          <el-input 
-            v-model="loginForm.email" 
-            placeholder="请输入邮箱"
-            @keyup.enter="handleLogin"
-            clearable
-            class="tech-input"
-            prefix-icon="Message"
-          />
+        <el-form-item prop="emailPrefix" class="form-item">
+          <div class="email-group">
+            <el-input 
+              v-model="loginForm.emailPrefix" 
+              placeholder="请输入邮箱前缀"
+              @keyup.enter="handleLogin"
+              clearable
+              class="tech-input email-prefix"
+              prefix-icon="Message"
+            />
+            <el-select
+              v-model="loginForm.emailDomain"
+              class="email-domain"
+              @keyup.enter="handleLogin"
+            >
+              <el-option label="@163.com" value="@163.com" />
+              <el-option label="@qq.com" value="@qq.com" />
+            </el-select>
+          </div>
         </el-form-item>
         <el-form-item prop="code" class="form-item">
           <el-input 
@@ -193,15 +203,27 @@ const currentYear = new Date().getFullYear()
 
 // 鐧诲綍琛ㄥ崟
 const loginForm = ref({
-  email: '',
+  emailPrefix: '',
+  emailDomain: '@163.com',
   code: ''
 })
 
+const buildEmail = () => `${loginForm.value.emailPrefix}${loginForm.value.emailDomain}`
+
 // 邮箱验证码登录校验规则
 const emailLoginRules = ref({
-  email: [
-    { required: true, message: '请输入邮箱', trigger: 'blur' },
-    { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }
+  emailPrefix: [
+    { required: true, message: '请输入邮箱前缀', trigger: 'blur' },
+    {
+      validator: (rule, value, callback) => {
+        if (!value || !/^[a-zA-Z0-9._%+-]+$/.test(value)) {
+          callback(new Error('邮箱前缀仅支持字母、数字和常见符号'))
+        } else {
+          callback()
+        }
+      },
+      trigger: 'blur'
+    }
   ],
   code: [
     { required: true, message: '请输入验证码', trigger: 'blur' },
@@ -269,7 +291,7 @@ const handleLogin = async () => {
     isLoginLoading.value = true
     // 璋冪敤鐪熷疄鐨勭櫥褰曟帴鍙?
     const response = await userLoginByEmailCode({
-      email: loginForm.value.email,
+      email: buildEmail(),
       code: loginForm.value.code
     })
     
@@ -288,7 +310,7 @@ const handleLogin = async () => {
         const usernameFromResponse =
           response.data?.data?.username || response.data?.username
         const usernameToStore =
-          usernameFromResponse || loginForm.value.email
+          usernameFromResponse || buildEmail()
         if (usernameToStore) {
           localStorage.setItem('ADMIN_USERNAME', usernameToStore)
         }
@@ -314,13 +336,13 @@ const handleLogin = async () => {
 // 邮箱验证码登录 - 获取验证码
 const getEmailLoginCode = async () => {
   if (isEmailCodeLoading.value) return
-  if (!loginForm.value.email) {
+  if (!loginForm.value.emailPrefix) {
     ElMessage.warning('请输入邮箱')
     return
   }
 
   try {
-    await loginRef.value.validateField('email')
+    await loginRef.value.validateField('emailPrefix')
   } catch (err) {
     return
   }
@@ -328,7 +350,7 @@ const getEmailLoginCode = async () => {
   isEmailCodeLoading.value = true
   emailCodeText.value = '发送中...'
   try {
-    await sendEmailLoginCode({ email: loginForm.value.email })
+    await sendEmailLoginCode({ email: buildEmail() })
     ElMessage.success('验证码已发送，有效期5分钟')
     let count = 60
     emailCodeText.value = `${count}s后重试`
@@ -416,7 +438,18 @@ const handleForgetPassword = async () => {
 }
 // 鎺ユ敹娉ㄥ唽缁勪欢鐨勬垚鍔熶簨浠讹紙鑷姩濉厖璐﹀彿鍒扮櫥褰曟锛?
 const handleRegisterSuccess = (username) => {
-  loginForm.value.username = username
+  if (!username) return
+  if (username.includes('@')) {
+    const parts = username.split('@')
+    const prefix = parts[0]
+    const domain = '@' + (parts[1] || '163.com')
+    loginForm.value.emailPrefix = prefix
+    if (['@163.com', '@qq.com'].includes(domain)) {
+      loginForm.value.emailDomain = domain
+    }
+  } else {
+    loginForm.value.emailPrefix = username
+  }
 }
 
 </script>
@@ -571,6 +604,48 @@ const handleRegisterSuccess = (username) => {
     color: #ef4444;
     font-size: 12px;
   }
+}
+
+.email-group {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.email-prefix {
+  flex: 1;
+  min-width: 0;
+}
+
+.email-domain {
+  width: 150px;
+}
+
+.email-domain ::v-deep(.el-select__wrapper) {
+  height: 48px;
+  background: rgba(26, 26, 26, 0.9);
+  border: 1px solid rgba(14, 165, 233, 0.1);
+  border-radius: 8px;
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  color: #f8f8f8;
+  transition: all 0.3s ease;
+}
+
+.email-domain ::v-deep(.el-select__wrapper.is-focus) {
+  border-color: #0ea5e9;
+  box-shadow:
+    0 0 8px rgba(14, 165, 233, 0.2),
+    inset 0 1px 2px rgba(0, 0, 0, 0.3);
+  background: rgba(26, 26, 26, 1);
+}
+
+.email-domain ::v-deep(.el-select__selected-item),
+.email-domain ::v-deep(.el-select__placeholder) {
+  color: #f8f8f8;
+}
+
+.email-domain ::v-deep(.el-select__caret) {
+  color: #0ea5e9;
 }
 
 .tech-input {
