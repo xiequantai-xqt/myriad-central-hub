@@ -228,7 +228,7 @@ let emailCodeTimer = null
 const currentYear = new Date().getFullYear()
 
 // 登录方式
-const loginMode = ref('password')
+const loginMode = ref('email')
 
 // 鐧诲綍琛ㄥ崟
 const loginForm = ref({
