@@ -34,6 +34,7 @@ export const useUserStore = defineStore('user', {
       this.userInfo = {}
       localStorage.removeItem('ADMIN_TOKEN')
       localStorage.removeItem('ADMIN_TOKEN_EXPIRES_AT')
+      localStorage.removeItem('ADMIN_USERNAME')
     }
   }
 })

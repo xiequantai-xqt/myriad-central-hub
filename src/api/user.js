@@ -31,3 +31,16 @@ export const userLogin = (data) => {
     timeout: REQUEST_TIMEOUT
   })
 }
+
+/**
+ * 退出登录
+ * @returns {Promise}
+ */
+export const userLogout = (data) => {
+  return service({
+    url: '/auth/logout',
+    method: 'post',
+    data,
+    timeout: REQUEST_TIMEOUT
+  })
+}

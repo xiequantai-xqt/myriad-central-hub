@@ -280,6 +280,13 @@ const handleLogin = async () => {
       if (token) {
         userStore.token = token
         localStorage.setItem('ADMIN_TOKEN', token)
+        const usernameFromResponse =
+          response.data?.data?.username || response.data?.username
+        const usernameToStore =
+          usernameFromResponse || loginForm.value.username
+        if (usernameToStore) {
+          localStorage.setItem('ADMIN_USERNAME', usernameToStore)
+        }
         // 1 小时过期
         localStorage.setItem('ADMIN_TOKEN_EXPIRES_AT', String(Date.now() + 60 * 60 * 1000))
       }
