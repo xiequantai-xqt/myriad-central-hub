@@ -280,6 +280,8 @@ const handleLogin = async () => {
       if (token) {
         userStore.token = token
         localStorage.setItem('ADMIN_TOKEN', token)
+        // 1 小时过期
+        localStorage.setItem('ADMIN_TOKEN_EXPIRES_AT', String(Date.now() + 60 * 60 * 1000))
       }
       // 假设store中有存储token和用户信息的方法，根据实际情况调整
       // userStore.setToken(response.data.token)
