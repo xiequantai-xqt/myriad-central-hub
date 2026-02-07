@@ -1,31 +1,38 @@
-<!-- src/views/login/index.vue -->
+﻿<!-- src/views/login/index.vue -->
 <template>
   <div class="login-container">
-    <!-- 1. 科技黑底层（带拉丝纹理） -->
+    <!-- 1. 绉戞妧榛戝簳灞傦紙甯︽媺涓濈汗鐞嗭級 -->
     <div class="bg-base"></div>
-    <!-- 2. 冷调网格扫描层（科技核心动效） -->
+    <!-- 2. 鍐疯皟缃戞牸鎵弿灞傦紙绉戞妧鏍稿績鍔ㄦ晥锛?-->
     <div class="bg-grid-scan"></div>
-    <!-- 3. 极简细网格层 -->
+    <!-- 3. 鏋佺畝缁嗙綉鏍煎眰 -->
     <div class="bg-grid"></div>
 
-    <!-- 登录面板（哑光黑玻璃拟态） -->
+    <!-- 鐧诲綍闈㈡澘锛堝搼鍏夐粦鐜荤拑鎷熸€侊級 -->
     <div class="login-box">
-      <!-- 顶部冷光装饰条 -->
+      <!-- 椤堕儴鍐峰厜瑁呴グ鏉?-->
       <div class="box-highlight"></div>
-      <!-- 极简logo/标题区 -->
+      <!-- 鏋佺畝logo/鏍囬鍖?-->
       <div class="login-logo">
         <div class="logo-icon"></div>
         <h2 class="login-title">核心管理系统</h2>
         <p class="login-desc">ENTERPRISE CORE SYSTEM v3.0</p>
       </div>
-      <!-- 表单区域（极简布局） -->
+      <div class="login-mode-switch">
+        <el-radio-group v-model="loginMode" size="small">
+          <el-radio-button label="password">账号密码</el-radio-button>
+          <el-radio-button label="email">邮箱验证码</el-radio-button>
+        </el-radio-group>
+      </div>
+      <!-- 琛ㄥ崟鍖哄煙锛堟瀬绠€甯冨眬锛?-->
       <el-form 
         :model="loginForm" 
-        :rules="loginRules" 
+        :rules="currentLoginRules" 
         ref="loginRef" 
         label-width="0"
         class="login-form"
       >
+        <template v-if="loginMode === 'password'">
         <el-form-item prop="username" class="form-item">
           <el-input 
             v-model="loginForm.username" 
@@ -49,9 +56,43 @@
             prefix-icon="Lock"
           />
         </el-form-item>
-        <!-- 忘记密码/注册 链接 -->
+        </template>
+        <template v-else>
+          <el-form-item prop="email" class="form-item">
+            <el-input 
+              v-model="loginForm.email" 
+              placeholder="请输入邮箱"
+              @keyup.enter="handleLogin"
+              clearable
+              class="tech-input"
+              prefix-icon="Message"
+            />
+          </el-form-item>
+          <el-form-item prop="code" class="form-item">
+            <el-input 
+              v-model="loginForm.code" 
+              placeholder="请输入验证码"
+              @keyup.enter="handleLogin"
+              clearable
+              class="tech-input"
+              prefix-icon="Message"
+              style="width: 65%; display: inline-block"
+            />
+            <el-button 
+              type="primary" 
+              class="tech-btn code-btn"
+              :loading="isEmailCodeLoading"
+              :disabled="isEmailCodeLoading"
+              @click="getEmailLoginCode"
+              style="width: 32%; display: inline-block; margin-left: 3%"
+            >
+              {{ emailCodeText }}
+            </el-button>
+          </el-form-item>
+        </template>
+        <!-- 蹇樿瀵嗙爜/娉ㄥ唽 閾炬帴 -->
         <div class="login-link-group">
-          <span class="link forget-link" @click="showForgetDialog = true">忘记密码？</span>
+          <span v-if="loginMode === 'password'" class="link forget-link" @click="showForgetDialog = true">忘记密码？</span>
           <span class="link register-link" @click="showRegisterDialog = true">注册账号</span>
         </div>
         <el-form-item class="login-btn-item">
@@ -62,17 +103,17 @@
             :loading="isLoginLoading"
             class="tech-btn"
           >
-            登 录
+            登录
           </el-button>
         </el-form-item>
       </el-form>
-      <!-- 底部极简版权（动态年份） -->
+      <!-- 搴曢儴鏋佺畝鐗堟潈锛堝姩鎬佸勾浠斤級 -->
       <div class="login-footer">
-        <span>© {{ currentYear }} CoreTech · All Rights Reserved</span>
+        <span>© {{ currentYear }} CoreTech All Rights Reserved</span>
       </div>
     </div>
 
-    <!-- 忘记密码弹窗（保留） -->
+    <!-- 蹇樿瀵嗙爜寮圭獥锛堜繚鐣欙級 -->
     <el-dialog 
       v-model="showForgetDialog" 
       title="找回登录密码" 
@@ -143,22 +184,18 @@
           <el-button 
             class="tech-btn cancel-btn"
             @click="showForgetDialog = false"
-          >
-            取 消
-          </el-button>
+          >取消</el-button>
           <el-button 
             type="primary" 
             class="tech-btn submit-btn"
             :loading="isForgetLoading"
             @click="handleForgetPassword"
-          >
-            确 认 修 改
-          </el-button>
+          >确认修改</el-button>
         </div>
       </template>
     </el-dialog>
 
-    <!-- 引入register目录下的index.vue组件（核心修改：路径调整） -->
+    <!-- 寮曞叆register鐩綍涓嬬殑index.vue缁勪欢锛堟牳蹇冧慨鏀癸細璺緞璋冩暣锛?-->
     <Register 
       v-model:visible="showRegisterDialog"
       @registerSuccess="handleRegisterSuccess"
@@ -167,14 +204,14 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
-// 核心修改：引入views/register/index.vue组件
+// 鏍稿績淇敼锛氬紩鍏iews/register/index.vue缁勪欢
 import Register from '@/views/register/index.vue'
-// 核心新增：引入userLogin接口函数
-import { userLogin } from '@/api/user.js'
+// 鏍稿績鏂板锛氬紩鍏serLogin鎺ュ彛鍑芥暟
+import { userLogin, userLoginByEmailCode, sendEmailLoginCode } from '@/api/user.js'
 
 const router = useRouter()
 const userStore = useUserStore()
@@ -183,28 +220,58 @@ const forgetRef = ref(null)
 const isLoginLoading = ref(false)
 const passwordInput = ref(null)
 
-// 动态年份
+const isEmailCodeLoading = ref(false)
+const emailCodeText = ref('获取验证码')
+let emailCodeTimer = null
+
+// 鍔ㄦ€佸勾浠?
 const currentYear = new Date().getFullYear()
 
-// 登录表单
+// 登录方式
+const loginMode = ref('password')
+
+// 鐧诲綍琛ㄥ崟
 const loginForm = ref({
   username: 'testUser',
-  password: '7kbCbdlb!XtNBI&'
+  password: '7kbCbdlb!XtNBI&',
+  email: '',
+  code: ''
 })
 
-// 登录校验规则
+// 鐧诲綍鏍￠獙瑙勫垯
 const loginRules = ref({
   username: [
     { required: true, message: '请输入管理员账号', trigger: 'blur' },
-    { min: 3, max: 20, message: '账号长度需3-20位', trigger: 'blur' }
+    { min: 3, max: 20, message: '账号长度需 3-20 位', trigger: 'blur' }
   ],
   password: [
     { required: true, message: '请输入登录密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度需6-20位', trigger: 'blur' }
+    { min: 6, max: 20, message: '密码长度需 6-20 位', trigger: 'blur' }
+  ]
+})
+// 邮箱验证码登录校验规则
+const emailLoginRules = ref({
+  email: [
+    { required: true, message: '请输入邮箱', trigger: 'blur' },
+    { type: 'email', message: '请输入正确的邮箱', trigger: 'blur' }
+  ],
+  code: [
+    { required: true, message: '请输入验证码', trigger: 'blur' },
+    { len: 6, message: '验证码长度为6位', trigger: 'blur' }
   ]
 })
 
-// 忘记密码相关（保留）
+const currentLoginRules = computed(() =>
+  loginMode.value === 'password' ? loginRules.value : emailLoginRules.value
+)
+
+watch(loginMode, () => {
+  if (loginRef.value) {
+    loginRef.value.clearValidate()
+  }
+})
+
+// 蹇樿瀵嗙爜鐩稿叧锛堜繚鐣欙級
 const showForgetDialog = ref(false)
 const isForgetLoading = ref(false)
 const isCodeLoading = ref(false)
@@ -218,44 +285,44 @@ const forgetForm = ref({
 const forgetRules = ref({
   username: [
     { required: true, message: '请输入管理员账号', trigger: 'blur' },
-    { min: 3, max: 20, message: '账号长度需3-20位', trigger: 'blur' }
+    { min: 3, max: 20, message: '账号长度需 3-20 位', trigger: 'blur' }
   ],
   code: [
     { required: true, message: '请输入验证码', trigger: 'blur' },
-    { len: 6, message: '验证码长度为6位', trigger: 'blur' }
+    { len: 6, message: '验证码长度为 6 位', trigger: 'blur' }
   ],
   newPassword: [
     { required: true, message: '请输入新密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度需6-20位', trigger: 'blur' }
+    { min: 6, max: 20, message: '密码长度需 6-20 位', trigger: 'blur' }
   ],
   confirmPassword: [
     { required: true, message: '请确认新密码', trigger: 'blur' },
-    { 
+    {
       validator: (rule, value, callback) => {
         if (value !== forgetForm.value.newPassword) {
           callback(new Error('两次输入的密码不一致'))
         } else {
           callback()
         }
-      }, 
-      trigger: 'blur' 
+      },
+      trigger: 'blur'
     }
   ]
 })
 
-// 注册弹窗控制（仅保留显示/隐藏变量）
+// 娉ㄥ唽寮圭獥鎺у埗锛堜粎淇濈暀鏄剧ず/闅愯棌鍙橀噺锛?
 const showRegisterDialog = ref(false)
 
-// 聚焦密码框
+// 鑱氱劍瀵嗙爜妗?
 const focusPasswordInput = () => {
   passwordInput.value?.focus()
 }
 
-// 核心修改：登录逻辑（替换为调用userLogin接口）
+// 鏍稿績淇敼锛氱櫥褰曢€昏緫锛堟浛鎹负璋冪敤userLogin鎺ュ彛锛?
 const handleLogin = async () => {
   if (isLoginLoading.value) return
   
-  // 表单验证
+  // 琛ㄥ崟楠岃瘉
   try {
     await loginRef.value.validate()
   } catch (err) {
@@ -265,11 +332,22 @@ const handleLogin = async () => {
 
   try {
     isLoginLoading.value = true
-    // 调用真实的登录接口
-    const response = await userLogin(loginForm.value)
+    // 璋冪敤鐪熷疄鐨勭櫥褰曟帴鍙?
+    let response
+    if (loginMode.value === 'password') {
+      response = await userLogin({
+        username: loginForm.value.username,
+        password: loginForm.value.password
+      })
+    } else {
+      response = await userLoginByEmailCode({
+        email: loginForm.value.email,
+        code: loginForm.value.code
+      })
+    }
     
-    // 接口调用成功后的处理（根据实际接口返回调整）
-    // 示例：将用户信息/Token存入store
+    // 鎺ュ彛璋冪敤鎴愬姛鍚庣殑澶勭悊锛堟牴鎹疄闄呮帴鍙ｈ繑鍥炶皟鏁达級
+    // 绀轰緥锛氬皢鐢ㄦ埛淇℃伅/Token瀛樺叆store
     if (response && response.data) {
       const token =
         response.data.token ||
@@ -283,22 +361,25 @@ const handleLogin = async () => {
         const usernameFromResponse =
           response.data?.data?.username || response.data?.username
         const usernameToStore =
-          usernameFromResponse || loginForm.value.username
+          usernameFromResponse ||
+          (loginMode.value === 'email'
+            ? loginForm.value.email
+            : loginForm.value.username)
         if (usernameToStore) {
           localStorage.setItem('ADMIN_USERNAME', usernameToStore)
         }
-        // 1 小时过期
+        // 1 灏忔椂杩囨湡
         localStorage.setItem('ADMIN_TOKEN_EXPIRES_AT', String(Date.now() + 60 * 60 * 1000))
       }
-      // 假设store中有存储token和用户信息的方法，根据实际情况调整
+      // 鍋囪store涓湁瀛樺偍token鍜岀敤鎴蜂俊鎭殑鏂规硶锛屾牴鎹疄闄呮儏鍐佃皟鏁?
       // userStore.setToken(response.data.token)
       // userStore.setUserInfo(response.data.user)
       
-      ElMessage.success('登录成功，进入核心系统...')
+      ElMessage.success('登录成功，进入系统...')
       setTimeout(() => router.push('/dashboard'), 1200)
     }
   } catch (err) {
-    // 错误处理（适配axios接口错误格式）
+    // 閿欒澶勭悊锛堥€傞厤axios鎺ュ彛閿欒鏍煎紡锛?
     const errorMsg = err.response?.data?.message || err.message || '账号或密码错误'
     ElMessage.error('登录失败：' + errorMsg)
   } finally {
@@ -306,14 +387,54 @@ const handleLogin = async () => {
   }
 }
 
-// 忘记密码验证码
+// 邮箱验证码登录 - 获取验证码
+const getEmailLoginCode = async () => {
+  if (isEmailCodeLoading.value) return
+  if (!loginForm.value.email) {
+    ElMessage.warning('请输入邮箱')
+    return
+  }
+
+  try {
+    await loginRef.value.validateField('email')
+  } catch (err) {
+    return
+  }
+
+  isEmailCodeLoading.value = true
+  emailCodeText.value = '发送中...'
+  try {
+    await sendEmailLoginCode({ email: loginForm.value.email })
+    ElMessage.success('验证码已发送，有效期5分钟')
+    let count = 60
+    emailCodeText.value = `${count}s后重试`
+    if (emailCodeTimer) clearInterval(emailCodeTimer)
+    emailCodeTimer = setInterval(() => {
+      count--
+      emailCodeText.value = `${count}s后重试`
+      if (count <= 0) {
+        clearInterval(emailCodeTimer)
+        emailCodeTimer = null
+        emailCodeText.value = '获取验证码'
+        isEmailCodeLoading.value = false
+      }
+    }, 1000)
+  } catch (err) {
+    const errorMsg = err.response?.data?.message || err.message || '发送失败'
+    ElMessage.error('获取验证码失败：' + errorMsg)
+    emailCodeText.value = '获取验证码'
+    isEmailCodeLoading.value = false
+  }
+}
+
+// 蹇樿瀵嗙爜楠岃瘉鐮?
 const getVerifyCode = async () => {
   if (!forgetForm.value.username) {
-    ElMessage.warning('请先输入管理员账号')
+    ElMessage.warning('请输入管理员账号')
     return
   }
   if (isCodeLoading.value) return
-  
+
   try {
     await forgetRef.value.validateField('username')
   } catch (err) {
@@ -326,10 +447,10 @@ const getVerifyCode = async () => {
     await new Promise(resolve => setTimeout(resolve, 1000))
     ElMessage.success('验证码已发送，有效期5分钟')
     let count = 60
-    codeText.value = `${count}s后重新获取`
+    codeText.value = `${count}s后重试`
     const timer = setInterval(() => {
       count--
-      codeText.value = `${count}s后重新获取`
+      codeText.value = `${count}s后重试`
       if (count <= 0) {
         clearInterval(timer)
         codeText.value = '获取验证码'
@@ -337,16 +458,14 @@ const getVerifyCode = async () => {
       }
     }, 1000)
   } catch (err) {
-    ElMessage.error('获取验证码失败：' + err.message)
+    ElMessage.error('获取验证码失败：' + (err.message || '请稍后重试'))
     codeText.value = '获取验证码'
     isCodeLoading.value = false
   }
 }
-
-// 忘记密码提交
 const handleForgetPassword = async () => {
   if (isForgetLoading.value) return
-  
+
   try {
     await forgetRef.value.validate()
   } catch (err) {
@@ -371,20 +490,19 @@ const handleForgetPassword = async () => {
     isForgetLoading.value = false
   }
 }
-
-// 接收注册组件的成功事件（自动填充账号到登录框）
+// 鎺ユ敹娉ㄥ唽缁勪欢鐨勬垚鍔熶簨浠讹紙鑷姩濉厖璐﹀彿鍒扮櫥褰曟锛?
 const handleRegisterSuccess = (username) => {
   loginForm.value.username = username
 }
 
-// 生命周期
+// 鐢熷懡鍛ㄦ湡
 onMounted(() => {
   passwordInput.value && passwordInput.value.focus()
 })
 </script>
 
 <style lang="scss" scoped>
-// 仅保留登录页和忘记密码的样式
+// 浠呬繚鐣欑櫥褰曢〉鍜屽繕璁板瘑鐮佺殑鏍峰紡
 .login-container {
   width: 100vw;
   height: 100vh;
@@ -502,6 +620,25 @@ onMounted(() => {
     text-transform: uppercase;
     margin: 0;
     opacity: 0.7;
+  }
+}
+
+.login-mode-switch {
+  display: flex;
+  justify-content: center;
+  margin: -6px 0 18px 0;
+
+  ::v-deep(.el-radio-button__inner) {
+    background: rgba(26, 26, 26, 0.9);
+    border-color: rgba(14, 165, 233, 0.3);
+    color: #cbd5e1;
+  }
+
+  ::v-deep(.is-active .el-radio-button__inner) {
+    color: #f8f8f8;
+    background: rgba(14, 165, 233, 0.2);
+    border-color: #0ea5e9;
+    box-shadow: 0 0 8px rgba(14, 165, 233, 0.25);
   }
 }
 
@@ -657,7 +794,7 @@ onMounted(() => {
   100% { background-position: 200% 0; }
 }
 
-// 忘记密码弹窗样式
+// 蹇樿瀵嗙爜寮圭獥鏍峰紡
 .tech-dialog {
   ::v-deep(.el-dialog) {
     background: rgba(18, 18, 18, 0.95);
@@ -716,3 +853,11 @@ onMounted(() => {
   }
 }
 </style>
+
+
+
+
+
+
+
+

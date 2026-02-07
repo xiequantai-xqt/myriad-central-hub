@@ -33,6 +33,35 @@ export const userLogin = (data) => {
 }
 
 /**
+ * 邮箱验证码登录 - 发送验证码
+ * @param {Object} data 参数 { email: 邮箱 }
+ * @returns {Promise}
+ */
+export const sendEmailLoginCode = (data) => {
+  return service({
+    // TODO: 根据后端实际路径调整
+    url: '/auth/login/email/code',
+    method: 'post',
+    data,
+    timeout: REQUEST_TIMEOUT
+  })
+}
+
+/**
+ * 邮箱验证码登录
+ * @param {Object} data 参数 { email: 邮箱, code: 验证码 }
+ * @returns {Promise}
+ */
+export const userLoginByEmailCode = (data) => {
+  return service({
+    url: '/auth/login/email-code',
+    method: 'post',
+    data,
+    timeout: REQUEST_TIMEOUT
+  })
+}
+
+/**
  * 退出登录
  * @returns {Promise}
  */
