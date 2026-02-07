@@ -1,13 +1,13 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Layout from '@/layout/index.vue'
 
-// Public routes
+// 静态路由（所有用户都可访问）
 export const constantRoutes = [
   {
     path: '/login',
     name: 'Login',
     component: () => import('@/views/login/index.vue'),
-    meta: { hidden: true, title: 'Login' }
+    meta: { hidden: true, title: '登录' }
   },
   {
     path: '/',
@@ -18,26 +18,26 @@ export const constantRoutes = [
         path: 'dashboard',
         name: 'Dashboard',
         component: () => import('@/views/dashboard/index.vue'),
-        meta: { title: 'Dashboard', icon: 'HomeFilled' }
+        meta: { title: '首页', icon: 'HomeFilled' }
       }
     ]
   },
   {
     path: '/system',
     component: Layout,
-    meta: { title: 'System', icon: 'Setting' },
+    meta: { title: '系统管理', icon: 'Setting' },
     children: [
       {
         path: 'user',
         name: 'User',
         component: () => import('@/views/system/user/index.vue'),
-        meta: { title: 'User' }
+        meta: { title: '用户管理' }
       },
       {
         path: 'role',
         name: 'Role',
         component: () => import('@/views/system/role/index.vue'),
-        meta: { title: 'Role' }
+        meta: { title: '角色管理' }
       }
     ]
   },
