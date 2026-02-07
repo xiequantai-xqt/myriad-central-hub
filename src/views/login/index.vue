@@ -18,81 +18,47 @@
         <h2 class="login-title">核心管理系统</h2>
         <p class="login-desc">ENTERPRISE CORE SYSTEM v3.0</p>
       </div>
-      <div class="login-mode-switch">
-        <el-radio-group v-model="loginMode" size="small">
-          <el-radio-button label="password">账号密码</el-radio-button>
-          <el-radio-button label="email">邮箱验证码</el-radio-button>
-        </el-radio-group>
-      </div>
       <!-- 琛ㄥ崟鍖哄煙锛堟瀬绠€甯冨眬锛?-->
       <el-form 
         :model="loginForm" 
-        :rules="currentLoginRules" 
+        :rules="emailLoginRules" 
         ref="loginRef" 
         label-width="0"
         class="login-form"
       >
-        <template v-if="loginMode === 'password'">
-        <el-form-item prop="username" class="form-item">
+        <el-form-item prop="email" class="form-item">
           <el-input 
-            v-model="loginForm.username" 
-            placeholder="请输入管理员账号"
-            @keyup.enter="focusPasswordInput"
-            clearable
-            class="tech-input"
-            prefix-icon="User"
-          />
-        </el-form-item>
-        <el-form-item prop="password" class="form-item">
-          <el-input 
-            v-model="loginForm.password" 
-            type="password" 
-            placeholder="请输入登录密码"
+            v-model="loginForm.email" 
+            placeholder="请输入邮箱"
             @keyup.enter="handleLogin"
             clearable
-            show-password
             class="tech-input"
-            ref="passwordInput"
-            prefix-icon="Lock"
+            prefix-icon="Message"
           />
         </el-form-item>
-        </template>
-        <template v-else>
-          <el-form-item prop="email" class="form-item">
-            <el-input 
-              v-model="loginForm.email" 
-              placeholder="请输入邮箱"
-              @keyup.enter="handleLogin"
-              clearable
-              class="tech-input"
-              prefix-icon="Message"
-            />
-          </el-form-item>
-          <el-form-item prop="code" class="form-item">
-            <el-input 
-              v-model="loginForm.code" 
-              placeholder="请输入验证码"
-              @keyup.enter="handleLogin"
-              clearable
-              class="tech-input"
-              prefix-icon="Message"
-              style="width: 65%; display: inline-block"
-            />
-            <el-button 
-              type="primary" 
-              class="tech-btn code-btn"
-              :loading="isEmailCodeLoading"
-              :disabled="isEmailCodeLoading"
-              @click="getEmailLoginCode"
-              style="width: 32%; display: inline-block; margin-left: 3%"
-            >
-              {{ emailCodeText }}
-            </el-button>
-          </el-form-item>
-        </template>
+        <el-form-item prop="code" class="form-item">
+          <el-input 
+            v-model="loginForm.code" 
+            placeholder="请输入验证码"
+            @keyup.enter="handleLogin"
+            clearable
+            class="tech-input"
+            prefix-icon="Message"
+            style="width: 65%; display: inline-block"
+          />
+          <el-button 
+            type="primary" 
+            class="tech-btn code-btn"
+            :loading="isEmailCodeLoading"
+            :disabled="isEmailCodeLoading"
+            @click="getEmailLoginCode"
+            style="width: 32%; display: inline-block; margin-left: 3%"
+          >
+            {{ emailCodeText }}
+          </el-button>
+        </el-form-item>
         <!-- 蹇樿瀵嗙爜/娉ㄥ唽 閾炬帴 -->
         <div class="login-link-group">
-          <span v-if="loginMode === 'password'" class="link forget-link" @click="showForgetDialog = true">忘记密码？</span>
           <span class="link register-link" @click="showRegisterDialog = true">注册账号</span>
         </div>
         <el-form-item class="login-btn-item">
@@ -204,22 +170,20 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
 // 鏍稿績淇敼锛氬紩鍏iews/register/index.vue缁勪欢
 import Register from '@/views/register/index.vue'
 // 鏍稿績鏂板锛氬紩鍏serLogin鎺ュ彛鍑芥暟
-import { userLogin, userLoginByEmailCode, sendEmailLoginCode } from '@/api/user.js'
+import { userLoginByEmailCode, sendEmailLoginCode } from '@/api/user.js'
 
 const router = useRouter()
 const userStore = useUserStore()
 const loginRef = ref(null)
 const forgetRef = ref(null)
 const isLoginLoading = ref(false)
-const passwordInput = ref(null)
-
 const isEmailCodeLoading = ref(false)
 const emailCodeText = ref('获取验证码')
 let emailCodeTimer = null
@@ -227,28 +191,12 @@ let emailCodeTimer = null
 // 鍔ㄦ€佸勾浠?
 const currentYear = new Date().getFullYear()
 
-// 登录方式
-const loginMode = ref('email')
-
 // 鐧诲綍琛ㄥ崟
 const loginForm = ref({
-  username: 'testUser',
-  password: '7kbCbdlb!XtNBI&',
   email: '',
   code: ''
 })
 
-// 鐧诲綍鏍￠獙瑙勫垯
-const loginRules = ref({
-  username: [
-    { required: true, message: '请输入管理员账号', trigger: 'blur' },
-    { min: 3, max: 20, message: '账号长度需 3-20 位', trigger: 'blur' }
-  ],
-  password: [
-    { required: true, message: '请输入登录密码', trigger: 'blur' },
-    { min: 6, max: 20, message: '密码长度需 6-20 位', trigger: 'blur' }
-  ]
-})
 // 邮箱验证码登录校验规则
 const emailLoginRules = ref({
   email: [
@@ -260,17 +208,6 @@ const emailLoginRules = ref({
     { len: 6, message: '验证码长度为6位', trigger: 'blur' }
   ]
 })
-
-const currentLoginRules = computed(() =>
-  loginMode.value === 'password' ? loginRules.value : emailLoginRules.value
-)
-
-watch(loginMode, () => {
-  if (loginRef.value) {
-    loginRef.value.clearValidate()
-  }
-})
-
 // 蹇樿瀵嗙爜鐩稿叧锛堜繚鐣欙級
 const showForgetDialog = ref(false)
 const isForgetLoading = ref(false)
@@ -314,9 +251,7 @@ const forgetRules = ref({
 const showRegisterDialog = ref(false)
 
 // 鑱氱劍瀵嗙爜妗?
-const focusPasswordInput = () => {
-  passwordInput.value?.focus()
-}
+
 
 // 鏍稿績淇敼锛氱櫥褰曢€昏緫锛堟浛鎹负璋冪敤userLogin鎺ュ彛锛?
 const handleLogin = async () => {
@@ -333,18 +268,10 @@ const handleLogin = async () => {
   try {
     isLoginLoading.value = true
     // 璋冪敤鐪熷疄鐨勭櫥褰曟帴鍙?
-    let response
-    if (loginMode.value === 'password') {
-      response = await userLogin({
-        username: loginForm.value.username,
-        password: loginForm.value.password
-      })
-    } else {
-      response = await userLoginByEmailCode({
-        email: loginForm.value.email,
-        code: loginForm.value.code
-      })
-    }
+    const response = await userLoginByEmailCode({
+      email: loginForm.value.email,
+      code: loginForm.value.code
+    })
     
     // 鎺ュ彛璋冪敤鎴愬姛鍚庣殑澶勭悊锛堟牴鎹疄闄呮帴鍙ｈ繑鍥炶皟鏁达級
     // 绀轰緥锛氬皢鐢ㄦ埛淇℃伅/Token瀛樺叆store
@@ -361,10 +288,7 @@ const handleLogin = async () => {
         const usernameFromResponse =
           response.data?.data?.username || response.data?.username
         const usernameToStore =
-          usernameFromResponse ||
-          (loginMode.value === 'email'
-            ? loginForm.value.email
-            : loginForm.value.username)
+          usernameFromResponse || loginForm.value.email
         if (usernameToStore) {
           localStorage.setItem('ADMIN_USERNAME', usernameToStore)
         }
@@ -380,7 +304,7 @@ const handleLogin = async () => {
     }
   } catch (err) {
     // 閿欒澶勭悊锛堥€傞厤axios鎺ュ彛閿欒鏍煎紡锛?
-    const errorMsg = err.response?.data?.message || err.message || '账号或密码错误'
+    const errorMsg = err.response?.data?.message || err.message || '邮箱或验证码错误'
     ElMessage.error('登录失败：' + errorMsg)
   } finally {
     isLoginLoading.value = false
@@ -495,10 +419,6 @@ const handleRegisterSuccess = (username) => {
   loginForm.value.username = username
 }
 
-// 鐢熷懡鍛ㄦ湡
-onMounted(() => {
-  passwordInput.value && passwordInput.value.focus()
-})
 </script>
 
 <style lang="scss" scoped>
@@ -620,25 +540,6 @@ onMounted(() => {
     text-transform: uppercase;
     margin: 0;
     opacity: 0.7;
-  }
-}
-
-.login-mode-switch {
-  display: flex;
-  justify-content: center;
-  margin: -6px 0 18px 0;
-
-  ::v-deep(.el-radio-button__inner) {
-    background: rgba(26, 26, 26, 0.9);
-    border-color: rgba(14, 165, 233, 0.3);
-    color: #cbd5e1;
-  }
-
-  ::v-deep(.is-active .el-radio-button__inner) {
-    color: #f8f8f8;
-    background: rgba(14, 165, 233, 0.2);
-    border-color: #0ea5e9;
-    box-shadow: 0 0 8px rgba(14, 165, 233, 0.25);
   }
 }
 
@@ -853,6 +754,9 @@ onMounted(() => {
   }
 }
 </style>
+
+
+
 
 
 
