@@ -1,12 +1,9 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+﻿:root {
+  font-family: "Space Grotesk", "Noto Sans SC", "Microsoft YaHei", sans-serif;
   line-height: 1.5;
   font-weight: 400;
-
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
+  color: #e6e9ef;
+  background-color: #0b0f16;
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
@@ -15,19 +12,51 @@
 
 a {
   font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
+  color: #7dd3fc;
+  text-decoration: none;
 }
 a:hover {
-  color: #535bf2;
+  color: #38bdf8;
 }
 
 body {
   margin: 0;
-  display: flex;
-  place-items: center;
   min-width: 320px;
   min-height: 100vh;
+  color: #e6e9ef;
+  background:
+    radial-gradient(1100px 700px at 10% -20%, rgba(56, 189, 248, 0.18), transparent 60%),
+    radial-gradient(900px 600px at 90% 10%, rgba(99, 102, 241, 0.16), transparent 60%),
+    radial-gradient(800px 500px at 50% 120%, rgba(16, 185, 129, 0.16), transparent 60%),
+    linear-gradient(180deg, #0b0f16 0%, #0a111f 60%, #0b0f16 100%);
+  position: relative;
+  overflow-x: hidden;
+}
+
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(rgba(125, 211, 252, 0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(125, 211, 252, 0.04) 1px, transparent 1px);
+  background-size: 120px 120px;
+  opacity: 0.5;
+  z-index: 0;
+}
+
+body::after {
+  content: "";
+  position: fixed;
+  inset: -30vh -10vw;
+  pointer-events: none;
+  background:
+    radial-gradient(400px 200px at 25% 20%, rgba(56, 189, 248, 0.18), transparent 60%),
+    radial-gradient(500px 260px at 80% 15%, rgba(99, 102, 241, 0.18), transparent 60%);
+  filter: blur(40px);
+  opacity: 0.6;
+  z-index: 0;
 }
 
 h1 {
@@ -36,15 +65,21 @@ h1 {
 }
 
 button {
-  border-radius: 8px;
-  border: 1px solid transparent;
+  border-radius: 10px;
+  border: 1px solid rgba(125, 211, 252, 0.18);
   padding: 0.6em 1.2em;
   font-size: 1em;
   font-weight: 500;
   font-family: inherit;
-  background-color: #1a1a1a;
+  background-color: rgba(12, 17, 28, 0.9);
+  color: #e6e9ef;
   cursor: pointer;
-  transition: border-color 0.25s;
+  transition: border-color 0.25s, box-shadow 0.25s, transform 0.2s;
+}
+button:hover {
+  border-color: rgba(125, 211, 252, 0.45);
+  box-shadow: 0 6px 18px rgba(56, 189, 248, 0.18);
+  transform: translateY(-1px);
 }
 button:hover {
   border-color: #646cff;
@@ -59,21 +94,43 @@ button:focus-visible {
 }
 
 #app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  width: 100%;
+  min-height: 100vh;
+  margin: 0;
+  padding: 0;
+  text-align: left;
+  position: relative;
+  z-index: 1;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+.el-container, .el-main, .el-aside, .el-header {
+  background: transparent !important;
+}
+
+.el-main {
+  background: transparent !important;
+}
+
+.el-table, .el-table__inner-wrapper, .el-card, .el-dialog {
+  background-color: rgba(12, 17, 28, 0.88) !important;
+  color: #e6e9ef;
+}
+
+.el-table th.el-table__cell, .el-table td.el-table__cell {
+  background-color: rgba(12, 17, 28, 0.88) !important;
+  color: #e6e9ef;
+}
+
+.el-table__body-wrapper, .el-table__header-wrapper {
+  background-color: transparent !important;
+}
+
+.el-input__wrapper, .el-textarea__inner {
+  background-color: rgba(12, 17, 28, 0.9) !important;
+  color: #e6e9ef;
+  border-color: rgba(125, 211, 252, 0.15) !important;
+}
+
+.el-dialog {
+  border: 1px solid rgba(125, 211, 252, 0.15);
 }

@@ -1,7 +1,7 @@
-<template>
+﻿<template>
   <el-container style="height: 100%">
     <el-aside width="200px" class="app-aside">
-      <div class="logo">后台管理系统</div>
+      <div class="logo">万象台·一体中枢</div>
       <el-menu
         :default-active="$route.path"
         :default-openeds="defaultOpeneds"
@@ -11,15 +11,28 @@
         active-text-color="#35f5c4"
         router
       >
+        <el-menu-item index="/dashboard">
+          <el-icon class="menu-icon"><HomeFilled /></el-icon>
+          <span>首页</span>
+        </el-menu-item>
         <template v-for="route in constantRoutes" :key="route.path">
           <template v-if="route.meta && !route.meta.hidden">
             <el-menu-item v-if="!route.children" :index="route.path">
               <component v-if="route.meta.icon" :is="route.meta.icon" />
               <span>{{ route.meta.title }}</span>
             </el-menu-item>
+            <el-menu-item
+              v-else-if="route.path === '/' && route.children && route.children.length === 1"
+              :index="route.path + '/' + route.children[0].path"
+            >
+              <component v-if="route.meta && route.meta.icon" :is="route.meta.icon" />
+              <span>{{ route.children[0].meta.title }}</span>
+            </el-menu-item>
             <el-sub-menu v-else :index="route.path">
               <template #title>
-                <component v-if="route.meta.icon" :is="route.meta.icon" />
+                <el-icon v-if="route.meta.icon" :class="route.path === '/system' ? 'menu-icon' : ''">
+                  <component :is="route.meta.icon" />
+                </el-icon>
                 <span>{{ route.meta.title }}</span>
               </template>
               <el-menu-item
@@ -43,9 +56,9 @@
             <el-icon class="el-icon--right"><ArrowDown /></el-icon>
           </span>
           <template #dropdown>
-            <el-dropdown-menu>
-              <el-dropdown-item @click="toLogout">退出登录</el-dropdown-item>
-            </el-dropdown-menu>
+              <el-dropdown-menu>
+                <el-dropdown-item @click="toLogout">退出登录</el-dropdown-item>
+              </el-dropdown-menu>
           </template>
         </el-dropdown>
       </el-header>
@@ -61,7 +74,7 @@ import { useUserStore } from '@/stores/user'
 import { constantRoutes } from '@/router'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import { ArrowDown } from '@element-plus/icons-vue'
+import { ArrowDown, HomeFilled } from '@element-plus/icons-vue'
 import { userLogout } from '@/api/user'
 
 const userStore = useUserStore()
@@ -113,9 +126,18 @@ userStore.getUserInfo().catch(() => {})
   height: 60px;
   line-height: 60px;
   color: #fff;
-  font-size: 18px;
+  font-size: 14px;
   text-align: center;
   font-weight: bold;
+}
+
+::v-deep(.el-menu-item .el-icon),
+::v-deep(.el-sub-menu__title .el-icon) {
+  font-size: 14px;
+}
+
+.menu-icon {
+  font-size: 30px;
 }
 .user-info {
   cursor: pointer;
@@ -125,3 +147,4 @@ userStore.getUserInfo().catch(() => {})
   padding: 0 20px;
 }
 </style>
+
