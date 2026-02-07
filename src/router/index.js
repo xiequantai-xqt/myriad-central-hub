@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+﻿import { createRouter, createWebHistory } from 'vue-router'
 import Layout from '@/layout/index.vue'
 
 // 静态路由（所有用户都可访问）
@@ -32,6 +32,33 @@ export const constantRoutes = [
         name: 'Role',
         component: () => import('@/views/system/role/index.vue'),
         meta: { title: '角色管理' }
+      }
+    ]
+  },
+  {
+    path: '/analysis',
+    component: Layout,
+    meta: { title: '经营分析' },
+    children: [
+      {
+        path: 'malatang',
+        name: 'MalatangAnalysis',
+        component: () => import('@/views/analysis/malatang/index.vue'),
+        meta: { title: '麻辣烫经营分析' },
+        children: [
+          {
+            path: 'product-sales',
+            name: 'MalatangProductSales',
+            component: () => import('@/views/analysis/malatang/product-sales/index.vue'),
+            meta: { title: '货品销售分析' }
+          },
+          {
+            path: 'delivery-reviews',
+            name: 'MalatangDeliveryReviews',
+            component: () => import('@/views/analysis/malatang/delivery-reviews/index.vue'),
+            meta: { title: '外卖评价分析' }
+          }
+        ]
       }
     ]
   },

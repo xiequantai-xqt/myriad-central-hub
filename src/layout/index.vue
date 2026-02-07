@@ -35,13 +35,26 @@
                 </el-icon>
                 <span>{{ route.meta.title }}</span>
               </template>
-              <el-menu-item
-                v-for="child in route.children"
-                :key="child.path"
-                :index="route.path + '/' + child.path"
-              >
-                <span>{{ child.meta.title }}</span>
-              </el-menu-item>
+              <template v-for="child in route.children" :key="child.path">
+                <el-menu-item
+                  v-if="!child.children"
+                  :index="route.path + '/' + child.path"
+                >
+                  <span>{{ child.meta.title }}</span>
+                </el-menu-item>
+                <el-sub-menu v-else :index="route.path + '/' + child.path">
+                  <template #title>
+                    <span>{{ child.meta.title }}</span>
+                  </template>
+                  <el-menu-item
+                    v-for="grand in child.children"
+                    :key="grand.path"
+                    :index="route.path + '/' + child.path + '/' + grand.path"
+                  >
+                    <span>{{ grand.meta.title }}</span>
+                  </el-menu-item>
+                </el-sub-menu>
+              </template>
             </el-sub-menu>
           </template>
         </template>
