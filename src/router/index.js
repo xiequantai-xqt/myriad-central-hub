@@ -28,12 +28,6 @@ export const constantRoutes = [
     meta: { title: '系统管理', icon: 'Setting' },
     children: [
       {
-        path: 'user',
-        name: 'User',
-        component: () => import('@/views/system/user/index.vue'),
-        meta: { title: '用户管理' }
-      },
-      {
         path: 'role',
         name: 'Role',
         component: () => import('@/views/system/role/index.vue'),
