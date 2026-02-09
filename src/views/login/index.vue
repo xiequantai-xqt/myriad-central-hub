@@ -1,4 +1,4 @@
-﻿<!-- src/views/login/index.vue -->
+﻿﻿﻿<!-- src/views/login/index.vue -->
 <template>
   <div class="login-container">
     <!-- 1. 绉戞妧榛戝簳灞傦紙甯︽媺涓濈汗鐞嗭級 -->
@@ -68,10 +68,7 @@
           </el-button>
         </el-form-item>
         <!-- 蹇樿瀵嗙爜/娉ㄥ唽 閾炬帴 -->
-        <div class="login-link-group">
-          <span class="link register-link" @click="showRegisterDialog = true">注册账号</span>
-        </div>
-        <el-form-item class="login-btn-item">
+<el-form-item class="login-btn-item">
           <el-button 
             type="primary" 
             @click="handleLogin" 
@@ -170,13 +167,7 @@
         </div>
       </template>
     </el-dialog>
-
-    <!-- 寮曞叆register鐩綍涓嬬殑index.vue缁勪欢锛堟牳蹇冧慨鏀癸細璺緞璋冩暣锛?-->
-    <Register 
-      v-model:visible="showRegisterDialog"
-      @registerSuccess="handleRegisterSuccess"
-    />
-  </div>
+</div>
 </template>
 
 <script setup>
@@ -184,8 +175,6 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { useUserStore } from '@/stores/user'
 import { ElMessage } from 'element-plus'
-// 鏍稿績淇敼锛氬紩鍏iews/register/index.vue缁勪欢
-import Register from '@/views/register/index.vue'
 // 鏍稿績鏂板锛氬紩鍏serLogin鎺ュ彛鍑芥暟
 import { userLoginByEmailCode, sendEmailLoginCode } from '@/api/user.js'
 
@@ -270,8 +259,6 @@ const forgetRules = ref({
 })
 
 // 娉ㄥ唽寮圭獥鎺у埗锛堜粎淇濈暀鏄剧ず/闅愯棌鍙橀噺锛?
-const showRegisterDialog = ref(false)
-
 // 鑱氱劍瀵嗙爜妗?
 
 
@@ -437,21 +424,6 @@ const handleForgetPassword = async () => {
   }
 }
 // 鎺ユ敹娉ㄥ唽缁勪欢鐨勬垚鍔熶簨浠讹紙鑷姩濉厖璐﹀彿鍒扮櫥褰曟锛?
-const handleRegisterSuccess = (username) => {
-  if (!username) return
-  if (username.includes('@')) {
-    const parts = username.split('@')
-    const prefix = parts[0]
-    const domain = '@' + (parts[1] || '163.com')
-    loginForm.value.emailPrefix = prefix
-    if (['@163.com', '@qq.com'].includes(domain)) {
-      loginForm.value.emailDomain = domain
-    }
-  } else {
-    loginForm.value.emailPrefix = username
-  }
-}
-
 </script>
 
 <style lang="scss" scoped>
@@ -579,25 +551,6 @@ const handleRegisterSuccess = (username) => {
 .login-form {
   .form-item {
     margin-bottom: 20px;
-  }
-
-  .login-link-group {
-    display: flex;
-    justify-content: space-between;
-    margin: -10px 0 20px 0;
-    font-size: 12px;
-
-    .link {
-      color: #0ea5e9;
-      opacity: 0.8;
-      cursor: pointer;
-      transition: all 0.3s ease;
-
-      &:hover {
-        opacity: 1;
-        text-shadow: 0 0 8px rgba(14, 165, 233, 0.3);
-      }
-    }
   }
 
   .el-form-item__error {
@@ -829,7 +782,6 @@ const handleRegisterSuccess = (username) => {
   }
 }
 </style>
-
 
 
 
