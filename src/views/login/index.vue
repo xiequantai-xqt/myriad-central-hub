@@ -301,8 +301,8 @@ const handleLogin = async () => {
         if (usernameToStore) {
           localStorage.setItem('ADMIN_USERNAME', usernameToStore)
         }
-        // 1 灏忔椂杩囨湡
-        localStorage.setItem('ADMIN_TOKEN_EXPIRES_AT', String(Date.now() + 60 * 60 * 1000))
+        // 12 小时过期
+        localStorage.setItem('ADMIN_TOKEN_EXPIRES_AT', String(Date.now() + 12 * 60 * 60 * 1000))
       }
       // 鍋囪store涓湁瀛樺偍token鍜岀敤鎴蜂俊鎭殑鏂规硶锛屾牴鎹疄闄呮儏鍐佃皟鏁?
       // userStore.setToken(response.data.token)
@@ -782,7 +782,6 @@ const handleForgetPassword = async () => {
   }
 }
 </style>
-
 
 
 

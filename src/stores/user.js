@@ -17,6 +17,10 @@ export const useUserStore = defineStore('user', {
       // 存储token到本地存储和状态
       this.token = res.data.token
       localStorage.setItem('ADMIN_TOKEN', res.data.token)
+      localStorage.setItem(
+        'ADMIN_TOKEN_EXPIRES_AT',
+        String(Date.now() + 12 * 60 * 60 * 1000)
+      )
       return res
     },
     // 获取用户信息
